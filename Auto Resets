@@ -1,0 +1,15 @@
+local player = game.Players.LocalPlayer
+local function onCharacterAdded(character)
+    local humanoid = character:WaitForChild("Humanoid")
+    humanoid.HealthChanged:Connect(function(health)
+        if health <= 5 then
+            humanoid:TakeDamage(1000) -- hoặc player:LoadCharacter()
+        end
+    end)
+end
+
+if player.Character then
+    onCharacterAdded(player.Character)
+end
+
+player.CharacterAdded:Connect(onCharacterAdded)
