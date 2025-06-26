@@ -57,7 +57,6 @@ task.spawn(function()
 
 	if server then
 		print("Teleporting to server with " .. server.playing .. " players in 5 seconds...")
-		task.wait(5) -- 🕐 Chờ 5 giây trước khi teleport
 		TeleportService:TeleportToPlaceInstance(PLACE_ID, server.id, Players.LocalPlayer)
 	else
 		warn("Không tìm thấy server phù hợp, sẽ ở lại server hiện tại.")
