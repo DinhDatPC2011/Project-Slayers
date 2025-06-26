@@ -1,1 +1,65 @@
+MoonLib:MakeNotification({Name = "! Complete Join Sever Ít !", Content = "# Wait 5s To Join Sever Ít #", Image = "rbxassetid://6031071050", Time = 5})
 
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
+local Players = game:GetService("Players")
+
+local PLACE_ID = game.PlaceId
+local MAX_PLAYERS = 24
+
+-- Hàm lấy danh sách server đang có
+local function getServerList(cursor)
+	local url = "https://games.roblox.com/v1/games/" .. PLACE_ID .. "/servers/Public?sortOrder=Asc&limit=100"
+	if cursor then
+		url = url .. "&cursor=" .. cursor
+	end
+
+	local success, response = pcall(function()
+		return game:HttpGet(url)
+	end)
+
+	if not success then
+		warn("Lấy server list thất bại:", response)
+		return nil
+	end
+
+	local data = HttpService:JSONDecode(response)
+	return data
+end
+
+-- Hàm tìm server ít người nhất
+local function findLowestPlayerServer()
+	local cursor = nil
+	local bestServer = nil
+	local leastPlayers = math.huge
+
+	repeat
+		local data = getServerList(cursor)
+		if not data then break end
+
+		for _, server in pairs(data.data) do
+			local currentPlayers = server.playing
+			if currentPlayers < leastPlayers and currentPlayers < MAX_PLAYERS and server.id ~= game.JobId then
+				leastPlayers = currentPlayers
+				bestServer = server
+			end
+		end
+
+		cursor = data.nextPageCursor
+	until not cursor
+
+	return bestServer
+end
+
+-- Main logic
+task.spawn(function()
+	local server = findLowestPlayerServer()
+
+	if server then
+		print("Teleporting to server with " .. server.playing .. " players in 5 seconds...")
+		task.wait(5) -- 🕐 Chờ 5 giây trước khi teleport
+		TeleportService:TeleportToPlaceInstance(PLACE_ID, server.id, Players.LocalPlayer)
+	else
+		warn("Không tìm thấy server phù hợp, sẽ ở lại server hiện tại.")
+	end
+end)
