@@ -1,0 +1,22 @@
+MoonLib:MakeNotification({Name = "! Complete Rejoin !", Content = "# Wait 5s To Rejon #", Image = "rbxassetid://6031071050", Time = 5})
+
+local TeleportService = game:GetService("TeleportService")
+local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+local placeId = game.PlaceId
+
+-- Gọi hàm này để rejoin
+local function rejoin()
+	task.wait(5) -- Chờ 5 giây trước khi rejoin
+
+	local success, err = pcall(function()
+		TeleportService:Teleport(placeId, player)
+	end)
+	if not success then
+		warn("Rejoin failed:", err)
+	end
+end
+
+-- Gọi trực tiếp khi chạy script (hoặc gọi từ nút GUI)
+rejoin()
